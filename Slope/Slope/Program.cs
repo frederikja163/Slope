@@ -3,7 +3,7 @@ using OpenTK.Graphics.OpenGL4;
 
 namespace Slope
 {
-    class Program
+    static class Program
     {
         static void Main(string[] args)
         {
