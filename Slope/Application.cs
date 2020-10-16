@@ -22,7 +22,7 @@ namespace Slope
             GL.ClearColor(0, 1, 1, 1);
             GL.Enable(EnableCap.DepthTest);
             
-            _layerStack = new LayerStack(new Game());
+            _layerStack = new LayerStack(new Game(_window));
         }
 
         public void Run()
@@ -42,7 +42,7 @@ namespace Slope
                 
                 _window.SwapBuffers();
                 
-                Window.PollEvents();
+                _window.PollEvents();
             }
         }
 

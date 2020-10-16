@@ -1,4 +1,5 @@
 ﻿using System;
+using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using GlfwWindow = OpenTK.Windowing.GraphicsLibraryFramework.Window;
 
@@ -6,33 +7,65 @@ namespace Slope
 {
     public sealed unsafe class Window : IDisposable
     {
-        private readonly GlfwWindow* _window;
+        private readonly GlfwWindow* _handle;
+        private Vector2i _size;
 
         public Window(int width, int height, string title)
         {
-            _window = GLFW.CreateWindow(width, height, title, null, null);
+            _handle = GLFW.CreateWindow(width, height, title, null, null);
+            Mouse = new Mouse(_handle);
+            Keyboard = new Keyboard(_handle);
+            _size = new Vector2i(width, height);
         }
 
-        public bool IsRunning => !GLFW.WindowShouldClose(_window);
+        public bool IsRunning => !GLFW.WindowShouldClose(_handle);
+        
+        public Mouse Mouse { get; }
+        
+        public Keyboard Keyboard { get; }
+        
+        public int Width
+        {
+            get => _size.X;
+        }
+        
+        public int Height
+        {
+            get => _size.Y;
+        }
+
+        public Vector2i Size
+        {
+            get => _size;
+            set
+            {
+                _size = value;
+                GLFW.SetWindowSize(_handle, _size.X, _size.Y);
+            }
+        }
 
         public void MakeCurrent()
         {
-            GLFW.MakeContextCurrent(_window);
+            GLFW.MakeContextCurrent(_handle);
         }
 
         public void SwapBuffers()
         {
-            GLFW.SwapBuffers(_window);
+            GLFW.SwapBuffers(_handle);
         }
 
         public void Dispose()
         {
-            GLFW.DestroyWindow(_window);
+            GLFW.DestroyWindow(_handle);
         }
 
-        public static void PollEvents()
+        public void PollEvents()
         {
+            Mouse.PrePoll();
+            Keyboard.PrePoll();
             GLFW.PollEvents();
+            Mouse.PostPoll();
+            Keyboard.PostPoll();
         }
         
         public static void InitGlfw()
