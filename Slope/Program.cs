@@ -7,8 +7,8 @@ namespace Slope
     {
         static void Main(string[] args)
         {
-            using Window window = new Window();
-            window.Run();
+            using Application app = new Application();
+            app.Run();
         }
     }
 }

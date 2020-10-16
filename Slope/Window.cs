@@ -1,41 +1,51 @@
-﻿using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
-using OpenTK.Windowing.Common;
-using OpenTK.Windowing.Desktop;
+﻿using System;
 using OpenTK.Windowing.GraphicsLibraryFramework;
+using GlfwWindow = OpenTK.Windowing.GraphicsLibraryFramework.Window;
 
 namespace Slope
 {
-    public sealed class Window : GameWindow
+    public sealed unsafe class Window : IDisposable
     {
-        public Window()
-            : base(new GameWindowSettings(){IsMultiThreaded = true}, new NativeWindowSettings(){Title =  "Slope"})
+        private readonly GlfwWindow* _window;
+
+        public Window(int width, int height, string title)
         {
-            RenderThreadStarted += OnRenderThreadStarted;
-            RenderFrame += OnRenderFrame;
-            Resize += OnResize;
-            Closed += OnClose;
+            _window = GLFW.CreateWindow(width, height, title, null, null);
         }
 
-        private void OnRenderThreadStarted()
+        public bool IsRunning => !GLFW.WindowShouldClose(_window);
+
+        public void MakeCurrent()
         {
-            GL.LoadBindings(new GLFWBindingsContext());
-            GL.ClearColor(Color4.Magenta);
+            GLFW.MakeContextCurrent(_window);
         }
 
-        private void OnRenderFrame(FrameEventArgs obj)
+        public void SwapBuffers()
         {
-            GL.Clear(ClearBufferMask.ColorBufferBit);
-            SwapBuffers();
+            GLFW.SwapBuffers(_window);
         }
 
-        private void OnClose()
+        public void Dispose()
         {
+            GLFW.DestroyWindow(_window);
         }
 
-        private void OnResize(ResizeEventArgs obj)
+        public static void PollEvents()
         {
-            GL.Viewport(0, 0, obj.Width, obj.Height);
+            GLFW.PollEvents();
+        }
+        
+        public static void InitGlfw()
+        {
+            if (!GLFW.Init())
+            {
+                throw new Exception("Glfw failed to initialize!");
+            }
+        }
+
+        public static void TerminateGlfw()
+        {
+            GLFW.Terminate();
         }
     }
 }
