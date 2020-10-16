@@ -24,6 +24,7 @@ namespace Slope
             List<float> vertices = new List<float>();
             List<uint> indices = new List<uint>();
             var positions = new List<Vector3>();
+            var normals = new List<Vector3>();
             var textureCoordinates = new List<Vector2>();
             var vertexIndices = new Dictionary<string, uint>();
             var line = "";
@@ -36,6 +37,13 @@ namespace Slope
                     var y = float.Parse(values[2]);
                     var z = float.Parse(values[3]);
                     positions.Add(new Vector3(x, y, z));
+                }
+                else if (values[0] == "vn")
+                {
+                    var x = float.Parse(values[1]);
+                    var y = float.Parse(values[2]);
+                    var z = float.Parse(values[3]);
+                    normals.Add(new Vector3(x, y, z));
                 }
                 else if (values[0] == "vt")
                 {
@@ -54,10 +62,15 @@ namespace Slope
                             var position = positions[positionIndex];
                             var textureCoordinateIndex = int.Parse(vertValue[1]) - 1;
                             var textureCoordinate = textureCoordinates[textureCoordinateIndex];
+                            var normalIndex = int.Parse(vertValue[2]) - 1;
+                            var normal = normals[normalIndex];
 
                             vertices.Add(position.X);
                             vertices.Add(position.Y);
                             vertices.Add(position.Z);
+                            vertices.Add(normal.X);
+                            vertices.Add(normal.Y);
+                            vertices.Add(normal.Z);
                             vertices.Add(textureCoordinate.X);
                             vertices.Add(textureCoordinate.Y);
                             index = (uint) vertices.Count / (3 + 3 + 2) - 1;
@@ -71,6 +84,7 @@ namespace Slope
 
             var verts = vertices.ToArray();
             var ind = indices.ToArray();
+            IndexCount = ind.Length;
             _vao = GL.GenVertexArray();
             Bind();
             
@@ -79,15 +93,21 @@ namespace Slope
             GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * verts.Length, verts, BufferUsageHint.StaticDraw);
             
             _ebo = GL.GenBuffer();
+                
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, _ebo);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, sizeof(float) * ind.Length, ind, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, sizeof(uint) * ind.Length, ind, BufferUsageHint.StaticDraw);
             
             GL.EnableVertexAttribArray(0);
-            GL.VertexAttribPointer(0, sizeof(float) * 2, VertexAttribPointerType.Float, false, sizeof(float) * 4, sizeof(float) * 0);
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, sizeof(float) * (3 + 3 + 2), sizeof(float) * (0));
             
             GL.EnableVertexAttribArray(1);
-            GL.VertexAttribPointer(1, sizeof(float) * 2, VertexAttribPointerType.Float, false, sizeof(float) * 4, sizeof(float) * 2);
+            GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, sizeof(float) * (3 + 3 + 2), sizeof(float) * (3));
+            
+            GL.EnableVertexAttribArray(2);
+            GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, sizeof(float) * (3 + 3 + 2), sizeof(float) * (3 + 3));
         }
+        
+        public int IndexCount { get; }
 
         public void Bind()
         {

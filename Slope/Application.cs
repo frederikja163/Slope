@@ -20,6 +20,7 @@ namespace Slope
             GL.LoadBindings(new GLFWBindingsContext());
             
             GL.ClearColor(0, 1, 1, 1);
+            GL.Enable(EnableCap.DepthTest);
             
             _layerStack = new LayerStack(new Game());
         }
@@ -35,7 +36,7 @@ namespace Slope
                 stopWatch.Restart();
                 _layerStack.Update(dt);
                     
-                GL.Clear(ClearBufferMask.ColorBufferBit);
+                GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
                 _layerStack.Draw();
                 
