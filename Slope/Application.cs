@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Reflection;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using Slope.Layers;
@@ -13,6 +14,7 @@ namespace Slope
         
         public Application()
         {
+            Assets.Assembly = Assembly.GetCallingAssembly();
             Window.InitGlfw();
             _window = new Window(800, 600, "Slope");
             _window.MakeCurrent();

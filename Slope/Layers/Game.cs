@@ -17,8 +17,8 @@ namespace Slope.Layers
         {
             _keyboard = window.Keyboard;
             
-            _mesh = new Mesh("Assets/player.obj", "Sphere");
-            _shader = new Shader(File.OpenText("Assets/shader.vert"), File.OpenText("Assets/shader.frag"));
+            _mesh = Mesh.LoadMeshes(Assets.Get("player.obj"))["Sphere"];
+            _shader = new Shader(Assets.Get("shader.vert"), Assets.Get("shader.frag"));
 
             _shader.Bind();
             var perspective = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(60f), window.Width / (float)window.Height, 0.01f, 100f);
@@ -47,6 +47,7 @@ namespace Slope.Layers
                 _velocity.X = -30f * dt;
             }
             _model *= Matrix4.CreateRotationX(1f * dt);
+            _model *= Matrix4.CreateRotationY(_velocity.X * dt);
             return false;
         }
 
