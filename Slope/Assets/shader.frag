@@ -1,9 +1,17 @@
 ﻿#version 330 core
-in vec3 fTextureCoordinate;
+in vec2 fTextureCoordinate;
 
 out vec4 Color;
 
 void main()
 {
-    Color = vec4(fTextureCoordinate, 1);
+    if ((fTextureCoordinate.x - int(fTextureCoordinate.x)) < 0.2f ||
+        (fTextureCoordinate.y - int(fTextureCoordinate.y)) < 0.2f)
+    {
+        Color = vec4(1, 1, 1, 1);
+    }
+    else
+    {
+        Color = vec4(0, 0, 0, 1);
+    }
 }

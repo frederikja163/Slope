@@ -7,10 +7,10 @@ uniform mat4 uModel;
 uniform mat4 uView;
 uniform mat4 uPerspective;
 
-out vec3 fTextureCoordinate;
+out vec2 fTextureCoordinate;
 
 void main()
 {
     gl_Position = uPerspective * uView * uModel * vec4(vPosition, 1);
-    fTextureCoordinate = vNormal;
+    fTextureCoordinate = vTextureCoordinate * 10;
 }

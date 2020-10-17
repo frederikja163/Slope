@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
@@ -11,24 +10,12 @@ namespace Slope.Layers
         private readonly Shader _shader;
         private readonly int _viewLoc, _modelLoc;
         private Matrix4 _view, _model;
+        private Keyboard _keyboard;
+        private Vector2 _velocity;
 
         public Game(Window window)
         {
-            window.Keyboard.OnKey += (sender, args) =>
-            {
-                if ((args.State & KeyState.Pressed) == KeyState.Pressed)
-                {
-                    if (args.Key == Key.W)
-                    {
-                        _model *= Matrix4.CreateRotationX(.5f);
-                    }
-                    else if (args.Key == Key.S)
-                    {
-                        _model *= Matrix4.CreateRotationX(-.5f);
-                    }
-                }
-                return false;
-            };
+            _keyboard = window.Keyboard;
             
             _mesh = new Mesh("Assets/player.obj", "Sphere");
             _shader = new Shader(File.OpenText("Assets/shader.vert"), File.OpenText("Assets/shader.frag"));
@@ -44,12 +31,22 @@ namespace Slope.Layers
             _modelLoc = Shader.GetUniformLocation(_shader, "uModel");
             _model = Matrix4.Identity;
             _shader.SetUniform(_modelLoc, ref _model);
+            _velocity = new Vector2(0, 1);
         }
 
         public bool Enabled => true;
 
         public bool Update(float dt)
         {
+            if (_keyboard.IsPressed(Key.A))
+            {
+                _velocity.X = 30f * dt;
+            }
+            if (_keyboard.IsPressed(Key.D))
+            {
+                _velocity.X = -30f * dt;
+            }
+            _model *= Matrix4.CreateRotationX(1f * dt);
             return false;
         }
 
