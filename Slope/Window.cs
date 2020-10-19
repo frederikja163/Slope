@@ -9,21 +9,27 @@ namespace Slope
     {
         private readonly GlfwWindow* _handle;
         private Vector2i _size;
+        private readonly Mouse _mouse;
+        private readonly Keyboard _keyboard;
 
         public Window(int width, int height, string title)
         {
             _handle = GLFW.CreateWindow(width, height, title, null, null);
-            Mouse = new Mouse(_handle);
-            Keyboard = new Keyboard(_handle);
+            if (_handle == null)
+            {
+                throw new Exception("Window failed to create");
+            }
+            _mouse = new Mouse(_handle);
+            _keyboard = new Keyboard(_handle);
             _size = new Vector2i(width, height);
         }
 
         public bool IsRunning => !GLFW.WindowShouldClose(_handle);
-        
-        public Mouse Mouse { get; }
-        
-        public Keyboard Keyboard { get; }
-        
+
+        public Mouse Mouse => _mouse;
+
+        public Keyboard Keyboard => _keyboard;
+
         public int Width
         {
             get => _size.X;

@@ -157,33 +157,48 @@ namespace Slope
 
         private readonly Dictionary<Key, KeyState> _keyStates;
         private readonly List<(Key key, int code)> _pressedKeys;
+        private readonly GLFWCallbacks.KeyCallback _keyCallback;
 
         internal Keyboard(GlfwWindow* handle)
         {
             _keyStates = new Dictionary<Key, KeyState>();
             _pressedKeys = new List<(Key key, int code)>();
             
-            GLFW.SetKeyCallback(handle, (window, keyRaw, code, action, mods) =>
+            _keyCallback = KeyCallback;
+            GLFW.SetKeyCallback(handle, _keyCallback);
+        }
+
+        public KeyState this[Key key] => _keyStates.TryGetValue(key, out var state) ? state : KeyState.Released;
+        
+        public delegate bool KeyEvent(Keyboard sender, KeyEventArgs e);
+
+        public KeyEvent? OnKey { get; set; }
+
+        public bool IsPressed(Key key)
+        {
+            return (this[key] & KeyState.Pressed) == KeyState.Pressed;
+        }
+
+        private void KeyCallback(GlfwWindow* window, Keys keyRaw, int code, InputAction action, KeyModifiers mods)
+        {
+            var key = (Key) keyRaw;
+                
+            KeyState state;
+            if (action == InputAction.Press && (this[key] & KeyState.Released) == KeyState.Released)
             {
-                var key = (Key) keyRaw;
+                state = KeyState.JustPressed;
+                _pressedKeys.Add((key, code));
+            }
+            else if (action == InputAction.Release)
+            {
+                state = KeyState.JustReleased;
+            }
+            else
+            {
+                return;
+            }
                 
-                KeyState state;
-                if (action == InputAction.Press && (this[key] & KeyState.Released) == KeyState.Released)
-                {
-                    state = KeyState.JustPressed;
-                    _pressedKeys.Add((key, code));
-                }
-                else if (action == InputAction.Release)
-                {
-                    state = KeyState.JustReleased;
-                }
-                else
-                {
-                    return;
-                }
-                
-                _keyStates[key] = state;
-            });
+            _keyStates[key] = state;
         }
 
         internal void PrePoll()
@@ -230,16 +245,5 @@ namespace Slope
                 }
             }
         }
-
-        public bool IsPressed(Key key)
-        {
-            return (this[key] & KeyState.Pressed) == KeyState.Pressed;
-        }
-
-        public KeyState this[Key key] => _keyStates.TryGetValue(key, out var state) ? state : KeyState.Released;
-        
-        public delegate bool KeyEvent(Keyboard sender, KeyEventArgs e);
-
-        public KeyEvent? OnKey;
     }
 }
