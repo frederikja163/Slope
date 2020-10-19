@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
@@ -11,7 +12,9 @@ namespace Slope.Layers
         private readonly int _viewLoc, _modelLoc;
         private Matrix4 _view, _model;
         private Keyboard _keyboard;
-        private Vector2 _velocity;
+        private Vector3 _velocity;
+        private Vector3 _pos;
+        private Quaternion _quaternion = Quaternion.Identity;
 
         public Game(Window window)
         {
@@ -28,13 +31,14 @@ namespace Slope.Layers
             _shader.SetUniform(Shader.GetUniformLocation(_shader, "uPerspective"), ref perspective);
 
             _viewLoc = Shader.GetUniformLocation(_shader, "uView");
-            _view = Matrix4.LookAt(new Vector3(0, 3, -3), Vector3.Zero, Vector3.UnitY);
+            _view = Matrix4.LookAt(new Vector3(0, 0, -3), Vector3.Zero, Vector3.UnitY);
             _shader.SetUniform(_viewLoc, ref _view);
 
             _modelLoc = Shader.GetUniformLocation(_shader, "uModel");
             _model = Matrix4.Identity;
             _shader.SetUniform(_modelLoc, ref _model);
-            _velocity = new Vector2(0, 1);
+            _velocity = new Vector3(0, 0, 1);
+            _pos = Vector3.Zero;
         }
 
         public bool Enabled => true;
@@ -43,14 +47,16 @@ namespace Slope.Layers
         {
             if (_keyboard.IsPressed(Key.A))
             {
-                _velocity.X = 30f * dt;
+                _velocity.X = 100f;
             }
             if (_keyboard.IsPressed(Key.D))
             {
-                _velocity.X = -30f * dt;
+                _velocity.X = -100f;
             }
-            _model *= Matrix4.CreateRotationX(1f * dt);
-            _model *= Matrix4.CreateRotationY(_velocity.X * dt);
+            _velocity.X *= dt;
+            _quaternion = Quaternion.FromAxisAngle(Vector3.Cross(Vector3.UnitY,  _velocity),
+                dt * MathF.PI) * _quaternion;
+            _pos += _velocity * dt;
             return false;
         }
 
@@ -60,6 +66,10 @@ namespace Slope.Layers
             _shader.SetUniform(_viewLoc, ref _view);
             
             _playerMesh.Bind();
+            _view = Matrix4.LookAt(new Vector3(0, _pos.Y, _pos.Z) + new Vector3(0, 3, -3), new Vector3(0, _pos.Y, _pos.Z), Vector3.UnitY);
+            _shader.SetUniform(_viewLoc, ref _view);
+            _model = Matrix4.CreateFromQuaternion(_quaternion);
+            _model *= Matrix4.CreateTranslation(_pos);
             _shader.SetUniform(_modelLoc, ref _model);
             GL.DrawElements(PrimitiveType.Triangles, _playerMesh.IndexCount, DrawElementsType.UnsignedInt, 0);
             

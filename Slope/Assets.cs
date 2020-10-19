@@ -6,7 +6,7 @@ namespace Slope
 {
     public static class Assets
     {
-        public static Assembly Assembly { get; set; }
+        public static Assembly? Assembly { get; set; }
         
         public static StreamReader Get(string name)
         {

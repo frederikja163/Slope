@@ -79,9 +79,8 @@ namespace Slope
             List<Vector2> textureCoordinates = new List<Vector2>();
             Dictionary<string, uint> vertexIndices = new Dictionary<string, uint>();
             string? line = "";
-            while (!reader.EndOfStream)
+            while ((line = reader.ReadLine()) != null)
             {
-                line = reader.ReadLine();
                 string[] values = line.Split(' ');
                 if (values[0] == "o")
                 {
