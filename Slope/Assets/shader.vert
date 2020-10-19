@@ -12,5 +12,5 @@ out vec2 fTextureCoordinate;
 void main()
 {
     gl_Position = uPerspective * uView * uModel * vec4(vPosition, 1);
-    fTextureCoordinate = vTextureCoordinate * 10;
+    fTextureCoordinate = vTextureCoordinate;
 }

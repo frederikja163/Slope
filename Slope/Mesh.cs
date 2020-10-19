@@ -90,11 +90,11 @@ namespace Slope
                         objects.Add(currentMesh, (vertices.ToArray(), indices.ToArray()));
                     }
                     
-                    vertices = new List<float>();
-                    indices = new List<uint>();
-                    positions = new List<Vector3>();
-                    textureCoordinates = new List<Vector2>();
-                    vertexIndices = new Dictionary<string, uint>();
+                    // vertices = new List<float>();
+                    // indices = new List<uint>();
+                    // positions = new List<Vector3>();
+                    // textureCoordinates = new List<Vector2>();
+                    // vertexIndices = new Dictionary<string, uint>();
                     currentMesh = values[1];
                 }
                 else if (values[0] == "v")

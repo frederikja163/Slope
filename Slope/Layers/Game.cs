@@ -6,7 +6,7 @@ namespace Slope.Layers
 {
     public sealed class Game : ILayer
     {
-        private readonly Mesh _mesh;
+        private readonly Mesh _playerMesh, _cubeMesh;
         private readonly Shader _shader;
         private readonly int _viewLoc, _modelLoc;
         private Matrix4 _view, _model;
@@ -16,8 +16,11 @@ namespace Slope.Layers
         public Game(Window window)
         {
             _keyboard = window.Keyboard;
+
+            var meshes = Mesh.LoadMeshes(Assets.Get("misc.obj"));
+            _playerMesh = Mesh.LoadMeshes(Assets.Get("misc.obj"))["Player"];
+            _cubeMesh = meshes["Cube"];
             
-            _mesh = Mesh.LoadMeshes(Assets.Get("player.obj"))["Sphere"];
             _shader = new Shader(Assets.Get("shader.vert"), Assets.Get("shader.frag"));
 
             _shader.Bind();
@@ -54,15 +57,21 @@ namespace Slope.Layers
         public void Draw()
         {
             _shader.Bind();
-            _mesh.Bind();
             _shader.SetUniform(_viewLoc, ref _view);
+            
+            _playerMesh.Bind();
             _shader.SetUniform(_modelLoc, ref _model);
-            GL.DrawElements(PrimitiveType.Triangles, _mesh.IndexCount, DrawElementsType.UnsignedInt, 0);
+            GL.DrawElements(PrimitiveType.Triangles, _playerMesh.IndexCount, DrawElementsType.UnsignedInt, 0);
+            
+            _cubeMesh.Bind();
+            var identity = Matrix4.Identity;
+            _shader.SetUniform(_modelLoc, ref identity);
+            GL.DrawElements(PrimitiveType.Triangles, _cubeMesh.IndexCount, DrawElementsType.UnsignedInt, 0);
         }
 
         public void Dispose()
         {
-            _mesh.Dispose();
+            _playerMesh.Dispose();
         }
     }
 }
