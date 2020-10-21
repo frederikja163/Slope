@@ -10,7 +10,7 @@ namespace Slope
         
         public static StreamReader Get(string name)
         {
-            var stream = Assembly.GetManifestResourceStream("Slope.Assets." + name);
+            var stream = Assembly?.GetManifestResourceStream("Slope.Assets." + name);
             #if DEBUG
             if (stream == null)
             {

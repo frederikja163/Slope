@@ -14,5 +14,4 @@
     <ItemGroup>
       <EmbeddedResource Include="**/Assets/**/*.*" />
     </ItemGroup>
-
 </Project>
